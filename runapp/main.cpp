@@ -1,18 +1,26 @@
-#include <stdio.h>
-#include <stdlib.h> // _get_pgmptr
+//#include <stdio.h>
+//#include <windows.h>	// GetFullPathName
+#include <stdlib.h>		// sprintf_s
 #include <string>
 
 int main(int argc, char *argv[])
 {
-	char* program;
-	_get_pgmptr(&program);
-	char cmd[512];
+	// get app dir
+	char program[_MAX_PATH];
+	char cmd[_MAX_PATH];
+
+	_fullpath(program, argv[0], _MAX_PATH);
 	std::string fullpath = program;
-	std::string directory;
-	const size_t last_slash_idx = fullpath.rfind('\\');
-	if (std::string::npos != last_slash_idx)
-		directory = fullpath.substr(0, last_slash_idx);
-	sprintf_s(cmd, "%s\\python\\runapppy.exe", directory.c_str());
-	printf(cmd);
+	std::string appdir = fullpath.substr(0, fullpath.length() - 4);
+
+	//size_t last = fullpath.find_last_of('\\');
+	//std::string appdir = fullpath.substr(0, last);
+	//printf("appdir=%s\n", appdir.c_str());
+	
+	sprintf_s(cmd, "%s\\runapppy.exe", appdir.c_str());
+
+	//sprintf_s(cmd, "%s\\app\\runmain.exe", appdir.c_str());
+	//sprintf_s(cmd, "%s\\python\\python.exe %s\\app\\app.py", appdir.c_str(), appdir.c_str());
+	//printf(cmd);
 	system((char *)cmd);
 }

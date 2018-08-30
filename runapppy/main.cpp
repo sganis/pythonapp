@@ -1,22 +1,29 @@
 #include <Python.h>
-#include <stdlib.h> // _get_pgmptr
+//#include <string> 
 
 int main(int argc, char *argv[])
 {
-	char* program;
-	_get_pgmptr(&program);
-	//printf(program);
+	char program[_MAX_PATH];
+	_fullpath(program, argv[0], _MAX_PATH);
+
+	// get app dir
+	//std::string fullpath = program;
+	//size_t last = fullpath.find_last_of('\\');
+	//std::string appdir = fullpath.substr(0, last);
+	//printf("appdir=%s\n", appdir.c_str());
+
 	Py_SetProgramName((wchar_t*)program);
 	Py_Initialize();
-	char cmd[1000];
-	snprintf(cmd, sizeof(cmd),
-		"import sys; import os\n"
-		"appdir=os.path.dirname(r'%s')\n"
-		"apppath=os.path.realpath(appdir + r'\\..\\app')\n"
-		"sys.path.append(apppath)\n"
-		"import app\n"
-		"app.run()\n",
-		program);
+	char cmd[_MAX_PATH];
+	snprintf(cmd, sizeof(cmd), "import app; app.run()\n");
+
+	//snprintf(cmd, sizeof(cmd),
+	//	"import sys\n"
+	//	"sys.path.append(r'%s\\..\\app')\n"
+	//	"import app\n"
+	//	"app.run()\n",
+	//	appdir.c_str());
+
 	PyRun_SimpleString(cmd);
 
 	if (Py_FinalizeEx() < 0)

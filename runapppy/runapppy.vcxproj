@@ -111,7 +111,7 @@
       <AdditionalLibraryDirectories>C:\Python37\libs</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(SolutionDir)release\python"</Command>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)release\runapp"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
