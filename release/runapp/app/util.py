@@ -2,12 +2,12 @@
 import subprocess
 
 def run(cmd):
-	print(f'Running command:\n{cmd}')
+	#print(f'Running command:\n{cmd}')
 	proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	ret = 0
 	try:
-		out, err = proc.communicate(timeout=15)
-	except TimeoutExpired:
+		out, err = proc.communicate(timeout=30)
+	except subprocess.TimeoutExpired:
 		proc.kill()
 		out, err = proc.communicate()
 	ret = proc.returncode
@@ -15,8 +15,8 @@ def run(cmd):
 		err = err.decode('ascii').strip()
 		print(f'error: {err}')
 	out = out.decode('ascii').strip()
-	print(f'output: {out}')
-	print(f'return: {ret}')
+	# print(f'output: {out}')
+	# print(f'return: {ret}')
 	return out, err, ret
 
 

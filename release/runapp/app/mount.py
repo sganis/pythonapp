@@ -19,8 +19,25 @@ def main(sshfs, drive, userhost):
 		-oDirInfoTimeout=10000 
 		-oVolumeInfoTimeout=10000
 		'''.replace('\n',' ').replace('\t','')
-	print(cmd)
+	# print(cmd)
 	util.run(cmd)
+
+	# [HKEY_CURRENT_USER\Network\Z]
+	# "RemotePath"="\\\\sshfs\\user@localhost\\..\\.."
+	# "UserName"=""
+	# "ProviderName"="Windows File System Proxy"
+	# "ProviderType"=dword:20737046
+	# "ConnectionType"=dword:00000001
+	# "ConnectFlags"=dword:00000000
+	letter = drive.strip(':')
+	remotepath = f'\\\\sshfs\\{userhost}\\..\\..'
+	key = fr'HKCU\Network\{letter}'
+	util.run(f'reg add {key} /v RemotePath /d "{remotepath}" /f')
+	util.run(f'reg add {key} /v UserName /d "" /f')
+	util.run(f'reg add {key} /v ProviderName /d "Windows File System Proxy" /f')
+	util.run(f'reg add {key} /v ProviderType /d 20737046 /t REG_DWORD /f')
+	util.run(f'reg add {key} /v ConnectionType /d 1 /t REG_DWORD /f')
+	util.run(f'reg add {key} /v ConnectFlags /d 0 /t REG_DWORD /f')
 
 if __name__ == '__main__':
 	import sys

@@ -16,15 +16,13 @@ def main(ssh, keygen, userhost):
 	print(f'Checking ssh keys for {userhost}...')
 
 	sshdir = os.path.expandvars("%USERPROFILE%\\.ssh")
-	privkey = os.path.join(sshdir, 'id_rsa')
+	seckey = os.path.join(sshdir, 'id_rsa')
+	pubkey = os.path.join(sshdir, 'id_rsa.pub')
 	
 	# Check if keys need to be generated
-	if not os.path.exists(privkey):
+	if not os.path.exists(seckey):
 		print('Generating new ssh keys...')
-		os.system(f'mkdir {sshdir} 2>nul')
-		if os.path.exists(privkey):
-			os.remove(privkey)
-		cmd = f'echo y | "{keygen}" -f {privkey} -q -N ""'
+		cmd = f'mkdir {sshdir} 2>nul && echo y | "{keygen}" -f {seckey} -q -N ""'
 		os.system(cmd)
 	else:
 		print('Private key already exists.')
@@ -33,8 +31,9 @@ def main(ssh, keygen, userhost):
 
 	print(f'Publising public key...\n')
 
-	# Read the new keys into a variable
-	with open("%s\\id_rsa.pub" % sshdir, 'r') as f:
+	# Generate and read the new keys into a variable
+	cmd = f'"{keygen}" -y -f {seckey} > {pubkey}'
+	with open(f'{pubkey}', 'r') as f:
 		key = f.read().strip()
 
 	# Copy these keys to the target machines.

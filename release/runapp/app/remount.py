@@ -91,7 +91,7 @@ def main():
 	ok = check_drive(c['drive'])
 
 	if not ok:
-		sys.path.insert(0, os.path.dirname(sshfs))
+		sys.path.insert(0, os.path.dirname(c['sshfs']))
 		unmount(c['drive'])
 		setup_ssh(c['ssh'], c['keygen'], c['userhost'])
 		set_drive_name(c['drivename'], c['userhost'])	
