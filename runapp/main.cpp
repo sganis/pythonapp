@@ -24,11 +24,6 @@ inline std::string now()
 		t.wDay, t.wHour, t.wMinute,t.wSecond);
 	return std::string(buffer);
 }
-void write_log(const char *fmt, ...)
-{
-	
-}
-
 // log text file with message
 inline void log(std::string exepath, const char* msg, ...)
 {
