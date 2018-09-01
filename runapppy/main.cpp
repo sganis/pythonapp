@@ -6,14 +6,19 @@
 // then import app.py from app directory and call app.run
 
 typedef void(*P_INITIALIZEEX)(int);
+typedef void(*P_PYSYS_SETARGVEX)(int, char**, int);
 typedef void(*P_RUN_SIMPLESTRING)(const char*);
 typedef void(*P_FINALIZEEX)(int);
 
-int main(int argc, char *argv[])
+//int main(int argc, char *argv[])
+// program without window
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int cmdShow)
 {
-	char program[_MAX_PATH];
-	_fullpath(program, argv[0], _MAX_PATH);
-	std::string exepath = program;
+	char buffer[MAX_PATH];
+	char fullpath[MAX_PATH];
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	_fullpath(fullpath, buffer, MAX_PATH);
+	std::string exepath = fullpath;
 	std::string apppath = exepath.substr(0, exepath.find_last_of("\\/"));
 	std::string libpath = apppath + "\\lib\\python37.dll";
 
@@ -27,10 +32,18 @@ int main(int argc, char *argv[])
 		return 2;
 	((P_INITIALIZEEX)pPy_InitializeEx)(0);
 
+	// locate and run the PySys_SetArgvEx() function
+	FARPROC pPySys_SetArgvEx = GetProcAddress(hPylib, "PySys_SetArgvEx");
+	if (pPySys_SetArgvEx == NULL)
+		return 3;
+	char *argv[] = { (char*)exepath.c_str() };
+	((P_PYSYS_SETARGVEX)pPySys_SetArgvEx)(1, (char**)argv, 0);
+
+
 	// locate and run the Py_InitializeEx() function
 	FARPROC pPyRun_SimpleString = GetProcAddress(hPylib, "PyRun_SimpleString");
 	if (pPyRun_SimpleString == NULL)
-		return 3;
+		return 4;
 	char pycode[1000];
 	snprintf(pycode, sizeof(pycode),
 		"import sys\n"
@@ -46,7 +59,7 @@ int main(int argc, char *argv[])
 	// locate and run the Py_FinalizeEx() function
 	FARPROC pPy_FinalizeEx = GetProcAddress(hPylib, "Py_FinalizeEx");
 	if (pPy_FinalizeEx == NULL)
-		return 4;
+		return 5;
 	((P_FINALIZEEX)pPy_FinalizeEx)(0);
 
 	FreeLibrary(hPylib);
